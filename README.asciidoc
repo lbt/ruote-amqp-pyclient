@@ -1,0 +1,36 @@
+This python class RuoteAMQP::Participant allows you to write python Participants for http://ruote.rubyforge.org/[Ruote]
+
+It was written as part of:
+  http://meego.gitorious.org/meego-infrastructure-tools/boss/trees/master/integration/RuoteAMQP
+and is part of the route and route-amqp demo in that project.
+
+
+Usage is shown below: 
+---------------------
+
+[code,python]
+----------------------------------------------
+#!/usr/bin/python
+import sys
+import os
+import random
+
+from  RuoteAMQP.workitem import Workitem
+from  RuoteAMQP.participant import Participant
+
+import simplejson as json
+
+class MyPart(Participant):
+    def consume(self):
+        wi = self.workitem
+        print "Got a workitem:"
+        print json.dumps(wi.to_h(), indent=4)
+        size=random.randint(500,1000)
+        print "\nSize is %s" % size
+        wi.set_field("image.size", size)
+        wi.set_result(True)
+
+print "Started a python participant"
+p = MyPart(ruote_queue="sizer", amqp_host="amqpvm", amqp_vhost="ruote-test")
+p.run()
+----------------------------------------------

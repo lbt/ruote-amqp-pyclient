@@ -99,4 +99,25 @@ class Participant:
           # different to 'amq.direct') with a routing_key for the queue
           self._chan.basic_publish(msg, exchange='', routing_key='ruote_workitems')
 
-
+     def register(self, name, options):
+          """
+          Relies on the engine supporting the "engine_command"
+          participant.
+          """
+          pdef = {
+               "definition": """
+        Ruote.process_definition do
+          engine_command
+        end
+      """,
+               "fields" : {
+                    "command" : "register",
+                    "name" : name,
+                    "options" : options
+                    }
+               }
+          # Encode the message as json
+          msg = amqp.Message(json.dumps(pdef))
+          # delivery_mode=2 is persistent
+          msg.properties["delivery_mode"] = 2 
+          self._chan.basic_publish(msg, exchange='', routing_key='ruote_workitems')

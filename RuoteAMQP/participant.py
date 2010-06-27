@@ -87,7 +87,7 @@ class Participant:
 
      def run(self):
           """
-          Currently an infinite loop waitin for messages on the AMQP channel.
+          Currently an infinite loop waiting for messages on the AMQP channel.
           """
           while True:
                self._chan.wait()

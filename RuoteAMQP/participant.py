@@ -14,6 +14,7 @@
 #~ You should have received a copy of the GNU General Public License
 #~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys, traceback
 from amqplib import client_0_8 as amqp
 from workitem import Workitem
 import simplejson as json
@@ -59,7 +60,21 @@ class Participant:
           "This is where a workitem message is handled"
 
           self.workitem = Workitem(msg.body)
-          self.consume()
+          try:
+               self.consume()
+          except Exception, e:
+               # This should be configureable:
+               print "Exception"
+               print '-'*60
+               traceback.print_exc(file=sys.stderr)
+               print '-'*60
+               print "Note: for information only. Workitem returning with result=false"
+               # And this should be the 'standardised' way of passing
+               # errors back via a workitem
+               # wi.set_error(e)
+               self.workitem.set_field("Error", "%s" % e)
+               self.workitem.set_result(None)
+               
           if not self.workitem.forget():
                self.reply_to_engine()
 

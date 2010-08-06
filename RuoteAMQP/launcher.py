@@ -19,9 +19,9 @@ from workitem import Workitem
 import AIR
 
 try:
-     import simplejson as json
-except ImportError:
      import json
+except ImportError:
+     import simplejson as json
 
 import threading
 

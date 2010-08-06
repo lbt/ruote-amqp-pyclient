@@ -17,7 +17,10 @@
 import sys, traceback
 from amqplib import client_0_8 as amqp
 from workitem import Workitem
-import simplejson as json
+try:
+     import json
+except ImportError:
+     import simplejson as json
 
 class Participant(object):
      """

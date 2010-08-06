@@ -19,7 +19,7 @@ from amqplib import client_0_8 as amqp
 from workitem import Workitem
 import simplejson as json
 
-class Participant:
+class Participant(object):
      """
      A Participant will do work in a Ruote process. Participant is
      essentially abstract and must be subclassed to provide a useful

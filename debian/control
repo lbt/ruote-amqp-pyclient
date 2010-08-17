@@ -7,8 +7,7 @@ Standards-Version: 3.7.2
 
 Package: python-route-amqp-pyclient
 Architecture: all
-Depends: ${python:Depends}
-XB-Python-Version: ${python:Versions}
+Depends: ${python:Depends}, python-amqlib
 Provides: ${python:Provides}
 Description: Python Ruote/AMQP client
 

@@ -1,14 +1,13 @@
 %define name ruote-amqp-pyclient
-%define version 1.0
-%define unmangled_version 1.0
-%define unmangled_version 1.0
+%define version 1.1
+%define unmangled_version 1.1
 %define release 1
 
 Summary: Python Ruote/AMQP client
 Name: %{name}
 Version: %{version}
 Release: %{release}
-Source0: %{name}_%{unmangled_version}-%{release}.tar.gz
+Source0: %{name}_%{unmangled_version}.tar.gz
 License: UNKNOWN
 Group: Development/Libraries
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot

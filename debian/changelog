@@ -1,3 +1,9 @@
+ruote-amqp-pyclient (1.1) unstable; urgency=low
+
+  * updated packaging.
+
+ -- David Greaves <david@dgreaves.com>  Thu, 01 Jul 2010 09:28:02 +0100
+
 ruote-amqp-pyclient (1.0-1) unstable; urgency=low
 
   * source package automatically created by stdeb 0.5.1

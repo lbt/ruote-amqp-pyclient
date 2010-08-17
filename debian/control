@@ -1,11 +1,11 @@
-Source: route-amqp-pyclient
+Source: ruote-amqp-pyclient
 Maintainer: David Greaves <david@dgreaves.com>
 Section: python
 Priority: optional
 Build-Depends: python-setuptools (>= 0.6b3), debhelper (>= 7), python-support (>= 0.8.4)
 Standards-Version: 3.7.2
 
-Package: python-route-amqp-pyclient
+Package: python-ruote-amqp-pyclient
 Architecture: all
 Depends: ${python:Depends}, python-amqlib
 Provides: ${python:Provides}

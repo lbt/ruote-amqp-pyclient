@@ -1,4 +1,7 @@
-import simplejson as json
+try:
+     import json
+except ImportError:
+     import simplejson as json
 from copy import deepcopy
 
 class FlowExpressionId(object):

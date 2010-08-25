@@ -2,7 +2,7 @@ from distutils.core import setup
 from setuptools import setup
 
 setup(name='route-amqp-pyclient',
-      version='1.0',
+      version='1.1',
       description='Python Ruote/AMQP client',
       author='David Greaves',
       author_email='david@dgreaves.com',

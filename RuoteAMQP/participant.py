@@ -125,6 +125,8 @@ class Participant(object):
           Relies on the engine supporting the "engine_command"
           participant.
           """
+          if 'position' not in options:
+              options['position'] = -2
           command = {
                "register": "RuoteAMQP::Participant",
                "name" : name,

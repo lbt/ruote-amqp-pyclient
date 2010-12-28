@@ -41,7 +41,7 @@ class Launcher(AIR.AMQPServer):
 #          self.chan.exchange_declare(exchange="", type="direct", durable=True,
 #                                     auto_delete=False)
 
-     def launch(self, process, fields):
+     def launch(self, process, fields=None, variables=None):
           """
           Launch a process definition
           """
@@ -49,6 +49,7 @@ class Launcher(AIR.AMQPServer):
           pdef = {
                "definition": process,
                "fields" : fields
+               "variables" : variables
                }
           # Encode the message as json
           msg = amqp.Message(json.dumps(pdef))

@@ -48,7 +48,7 @@ class Launcher(AIR.AMQPServer):
           # FIXME : Raise exception if fields not dict
           pdef = {
                "definition": process,
-               "fields" : fields
+               "fields" : fields,
                "variables" : variables
                }
           # Encode the message as json

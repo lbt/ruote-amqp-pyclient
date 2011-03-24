@@ -1,4 +1,4 @@
-ruote-amqp-pyclient (1.2) unstable; urgency=low
+ruote-amqp-pyclient (1.12) unstable; urgency=low
 
   * Merge in the 'register' feature (although this is going away)
   * Allow 'variables' to be passed to ruote
@@ -6,6 +6,7 @@ ruote-amqp-pyclient (1.2) unstable; urgency=low
   * Add a finish() method that causes the run() to exit next time a
     message is received (unused, untested)
   * Use the new position option to play nice with ruote-kit's catch all participant
+  * Increment version to skip some odd numbering in OBS
 
  -- David Greaves <david@dgreaves.com>  Thu, 24 Mar 2011 21:31:18 +0000
 

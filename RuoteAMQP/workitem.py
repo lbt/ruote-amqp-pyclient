@@ -145,7 +145,10 @@ class Workitem(object):
 
     def forget(self):
         "Is this workitem forgotten? If so no reply is expected."
-        return self.fields()['params']['forget']
+        if 'forget' in self.fields()['params']:
+             return self.fields()['params']['forget']
+        else:
+             return False
 
     def __eq__ (self, other):
         "Warning : equality is based on fei and not on payload !"

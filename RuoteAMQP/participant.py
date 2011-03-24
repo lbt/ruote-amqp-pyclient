@@ -92,14 +92,17 @@ class Participant(object):
           """
           Currently an infinite loop waiting for messages on the AMQP channel.
           """
-          while True:
+          self._running = True
+          while self._running:
                self._chan.wait()
-
-     def finish(self):
-          "Closes channel and connection"
           self._chan.basic_cancel()
           self._chan.close()
           self._conn.close()
+ 
+
+     def finish(self):
+          "Closes channel and connection"
+          self._running = False
 
           
      def reply_to_engine(self):

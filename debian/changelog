@@ -1,4 +1,10 @@
-ruote-amqp-pyclient (1.12) unstable; urgency=low
+python-ruote-amqp (1.13) unstable; urgency=low
+
+  * Rename to python-ruote-amqp
+
+ -- David Greaves <david@dgreaves.com>  Fri, 25 Mar 2011 19:11:39 +0000
+
+python-ruote-amqp (1.12) unstable; urgency=low
 
   * Merge in the 'register' feature (although this is going away)
   * Allow 'variables' to be passed to ruote
@@ -10,13 +16,13 @@ ruote-amqp-pyclient (1.12) unstable; urgency=low
 
  -- David Greaves <david@dgreaves.com>  Thu, 24 Mar 2011 21:31:18 +0000
 
-ruote-amqp-pyclient (1.1) unstable; urgency=low
+python-ruote-amqp (1.1) unstable; urgency=low
 
   * updated packaging.
 
  -- David Greaves <david@dgreaves.com>  Thu, 01 Jul 2010 09:28:02 +0100
 
-ruote-amqp-pyclient (1.0-1) unstable; urgency=low
+python-ruote-amqp (1.0-1) unstable; urgency=low
 
   * source package automatically created by stdeb 0.5.1
 

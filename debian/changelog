@@ -1,3 +1,9 @@
+python-ruote-amqp (1.14-1) unstable; urgency=low
+
+  * Add missing dependency on python-air
+
+ -- David Greaves <david@dgreaves.com>  Mon, 28 Mar 2011 20:14:14 +0100
+
 python-ruote-amqp (1.13) unstable; urgency=low
 
   * Rename to python-ruote-amqp

@@ -1,6 +1,6 @@
 %define name ruote-amqp-pyclient
-%define version 1.13
-%define unmangled_version 1.13
+%define version 1.14
+%define unmangled_version 1.14
 %define release 1
 
 Summary: Python Ruote/AMQP client

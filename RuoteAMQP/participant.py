@@ -62,7 +62,16 @@ class Participant(object):
      def workitem_callback(self, msg):
           "This is where a workitem message is handled"
 
-          self.workitem = Workitem(msg.body)
+          try:
+               self.workitem = Workitem(msg.body)
+          except ValueError, e:
+               print "Exception decoding incoming json"
+               print '-'*60
+               print msg.body
+               print '-'*60
+               print "Note: Now re-raising exception"
+               raise e
+
           try:
                self.consume()
           except Exception, e:

@@ -84,7 +84,7 @@ class Participant(object):
                # And this should be the 'standardised' way of passing
                # errors back via a workitem
                # wi.set_error(e)
-               self.workitem.set_field("Error", "%s" % e)
+               self.workitem.set_field("Exception", "%s" % e)
                self.workitem.set_result(None)
                
           if not self.workitem.forget():

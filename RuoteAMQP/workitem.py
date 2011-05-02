@@ -177,9 +177,9 @@ class Workitem(object):
         """
         ref=self._h['fields']
         for k in key.split("."):
-            if not key in ref:
+            if not k in ref:
                 return None
-            ref = ref[key]
+            ref = ref[k]
         return ref
 
     def lf(self, key, container_lookup=False):

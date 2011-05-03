@@ -28,7 +28,7 @@ class DictAttrProxy(object):
     # any nested dict items are also proxied
     def __getattr__(self, attr):
         r = self._d.get(attr, None)
-        if r and type(r) is dict:
+        if type(r) is dict:
             return DictAttrProxy(r)
         return r
     # Note that writing into an entry creates it.

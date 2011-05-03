@@ -280,6 +280,6 @@ class Workitem(object):
         """
         return DictAttrProxy(self._h['fields']['params'])
 
-
-
-
+    def dump(self):
+        "A useful and consistent dump format"
+        return json.dumps(wid.to_h(), sort_keys=True, indent=4)

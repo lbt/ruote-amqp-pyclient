@@ -1,7 +1,13 @@
-%define name ruote-amqp-pyclient
+%define name python-ruote-amqp
 %define version 0.2.1
 %define unmangled_version 0.2.1
 %define release 1
+
+%define python python%{?__python_ver}
+%define __python /usr/bin/%{python}
+%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
+%{!?python_sitearch: %global python_sitearch %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib(1))")}
+
 
 Summary: Python Ruote/AMQP client
 Name: %{name}
@@ -34,4 +40,4 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -f INSTALLED_FILES
 %defattr(-,root,root)
-/usr/lib/python2.6/site-packages/RuoteAMQP
+%{python_sitelib}/RuoteAMQP

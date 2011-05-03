@@ -1,8 +1,43 @@
+#!/usr/bin/python
+
 try:
-     import json
+    import json
 except ImportError:
-     import simplejson as json
+    import simplejson as json
 from copy import deepcopy
+
+class DictAttrProxy(object):
+    """
+    This allows a dict object to be accessed in a pretty way.
+    Given :
+      wi = { 'ev': { 'val': 5, 'items': [1,2,3] } }
+    then
+      wip = DictAttrProxy(wi)
+      wip.ev.val => 5
+      wip.ev.items[1]=5
+      wi => {'ev': {'items': [1, 5, 3], 'val': 5}}
+    """
+    def __init__(self, d):
+        # This: 
+        #   self._d = d 
+        # won't work as we can't set a local attribute as we override
+        # __setattr__ so instead we poke straight into the __dict__ :
+        self.__dict__['_d'] = d
+
+    # Any attempt to get an attr looks it up in the proxied dict
+    # any nested dict items are also proxied
+    def __getattr__(self, attr):
+        r = self._d.get(attr, None)
+        if r and type(r) is dict:
+            return DictAttrProxy(r)
+        return r
+    # Note that writing into an entry creates it.
+    def __setattr__(self, attr, value):
+        self._d[attr] = value
+    # and if we want to use this syntax to get at a nested dict:
+    def as_dict(self):
+        return self._d
+
 
 class FlowExpressionId(object):
     """
@@ -17,7 +52,7 @@ class FlowExpressionId(object):
     Feis contain four pieces of information :
   
     * wfid : workflow instance id, the identifier for the process instance
-    * sub_wfid : the identifier for the sub process within the main instance
+    * subid : the identifier for the sub process within the main instance
     * expid : the expression id, where in the process tree
     * engine_id : only relevant in multi engine scenarii (defaults to 'engine')
     """
@@ -30,24 +65,25 @@ class FlowExpressionId(object):
     def __getitem__(self, key):
         return self._h[key]
 
-    def expid(self):
-        return self._h['expid']
+    @property
+    def expid(self): return self._h['expid']
 
-    def wfid(self):
-        return self._h['wfid']
+    @property
+    def wfid(self): return self._h['wfid']
 
-    def sub_wfid(self):
-        return self._h['sub_wfid']
+    @property
+    def subid(self): return self._h['subid']
 
-    def engine_id(self):
-        return self._h['engine_id']
-
-    def expid(self):
-        return self._h['expid']
+    @property
+    def engine_id(self): return self._h['engine_id']
 
     def to_storage_id(self):
-        return "%s!%s!%s" % (self._h['expid'], self._h['sub_wfid'], self._h['wfid'])
+        return "%s!%s!%s" % (
+            self._h['expid'], 
+            self._h['subid'] if self._h['subid'] else self._h['sub_wfid'],
+            self._h['wfid'])
 
+    @property
     def child_id(self):
         """
         Returns the last number in the expid. For instance, if the expid is
@@ -83,6 +119,7 @@ class Workitem(object):
         "Returns the underlying Hash instance."
         return self._h
 
+    @property
     def sid(self):
         """
         The string id for this workitem (something like "0_0!!20100507-wagamama").
@@ -90,7 +127,7 @@ class Workitem(object):
         """
         return self._fei.to_storage_id()
 
-
+    @property
     def wfid(self):
         """
         Returns the "workflow instance id" (unique process instance id) of
@@ -98,6 +135,7 @@ class Workitem(object):
         """
         return self._fei.wfid
 
+    @property
     def fei(self):
         "Returns a Ruote::FlowExpressionId instance."
         return FlowExpressionId(self._h['fei'])
@@ -107,6 +145,7 @@ class Workitem(object):
         """Returns a complete copy of this workitem."""
         return Workitem(self._h)
 
+    @property
     def participant_name(self):
         """
         The participant for which this item is destined. Will be nil when
@@ -115,17 +154,20 @@ class Workitem(object):
         """
         return self._h['participant_name']
 
+    @property
     def fields(self):
         "Returns the payload, ie the fields hash."
-        return self._h['fields']
+        return DictAttrProxy(self._h['fields'])
 
-    def set_fields(self, fields):
+    @fields.setter
+    def fields(self, fields):
         """
         Sets all the fields in one sweep.
         Remember : the fields must be a JSONifiable hash.
         """
         self._h['fields'] = fields
 
+    @property
     def result(self):
         """
         A shortcut to the value in the field named __result__
@@ -133,22 +175,25 @@ class Workitem(object):
         This field is used by the if expression for instance to determine
         if it should branch to its 'then' or its 'else'.
         """
-        return self.fields()['__result__']
+        return self.fields.__result__
 
-    def set_result(self, r):
+    @result.setter
+    def result(self, r):
         "Sets the value of the 'special' field __result__"
-        self.fields()['__result__'] = r
+        self.fields.__result__ = r
 
-    def dispatch_at(self):
+    @property
+    def dispatched_at(self):
         "When was this workitem dispatched ?"
-        return self.fields()['dispatched_at']
+        return self.fields.dispatched_at
 
+    @property
     def forget(self):
         "Is this workitem forgotten? If so no reply is expected."
-        if 'forget' in self.fields()['params']:
-             return self.fields()['params']['forget']
+        if self.params.forget:
+            return True
         else:
-             return False
+            return False
 
     def __eq__ (self, other):
         "Warning : equality is based on fei and not on payload !"
@@ -163,9 +208,11 @@ class Workitem(object):
         "Warning : hash is fei's hash."
         return hash(self._h['fei'])
 
-
     def lookup(self, key, container_lookup=False):
         """
+        Not needed : use
+           workitem.fields.toto.address
+
         For a simple key
            workitem.lookup('toto')
         is equivalent to
@@ -182,9 +229,7 @@ class Workitem(object):
             ref = ref[k]
         return ref
 
-    def lf(self, key, container_lookup=False):
-        "'lf' for 'lookup field'"
-        return self.lookup(key, container_lookup)
+    lf = lookup
 
     def set_field(self, key, value):
         """
@@ -207,15 +252,22 @@ class Workitem(object):
             ref = ref[k]
         ref[last] = value
 
-
+    @property
     def timed_out(self):
         "Shortcut for wi.fields['__timed_out__']"
         return self._h['fields']['__timed_out__']
 
-    def error(self):
+    @property
+    def error(self, err):
         "Shortcut for wi.fields['__error__']"
         return self._h['fields']['__error__']
 
+    @error.setter
+    def error(self, err):
+        "Shortcut for wi.fields['__error__']"
+        self._h['fields']['__error__']=err
+
+    @property
     def params(self):
         """
         Shortcut for wi.fields['params']
@@ -226,4 +278,8 @@ class Workitem(object):
         contains
            { 'ref' => 'toto', 'task' => 'x' }
         """
-        return self._h['fields']['params']
+        return DictAttrProxy(self._h['fields']['params'])
+
+
+
+

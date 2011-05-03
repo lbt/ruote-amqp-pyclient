@@ -84,10 +84,10 @@ class Participant(object):
                # And this should be the 'standardised' way of passing
                # errors back via a workitem
                # wi.set_error(e)
-               self.workitem.set_field("Exception", "%s" % e)
-               self.workitem.set_result(None)
-               
-          if not self.workitem.forget():
+               self.workitem.Exception = "%s" % e
+               self.workitem.result = None
+
+          if not self.workitem.forget:
                self.reply_to_engine()
 
      def consume():
@@ -107,13 +107,13 @@ class Participant(object):
           self._chan.basic_cancel()
           self._chan.close()
           self._conn.close()
- 
+
 
      def finish(self):
           "Closes channel and connection"
           self._running = False
 
-          
+
      def reply_to_engine(self):
           """
           When the job is complete the workitem is passed back to the
@@ -122,8 +122,8 @@ class Participant(object):
           """
           msg = amqp.Message(json.dumps(self.workitem.to_h()))
           # delivery_mode=2 is persistent
-          msg.properties["delivery_mode"] = 2 
-          
+          msg.properties["delivery_mode"] = 2
+
           # Publish the message.
           # Notice that this is sent to the anonymous/'' exchange (which is
           # different to 'amq.direct') with a routing_key for the queue
@@ -144,5 +144,5 @@ class Participant(object):
           # Encode the message as json
           msg = amqp.Message(json.dumps(command))
           # delivery_mode=2 is persistent
-          msg.properties["delivery_mode"] = 2 
+          msg.properties["delivery_mode"] = 2
           self._chan.basic_publish(msg, exchange='', routing_key='ruote_workitems')

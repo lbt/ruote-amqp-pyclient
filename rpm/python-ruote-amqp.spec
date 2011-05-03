@@ -7,7 +7,7 @@ Summary: Python Ruote/AMQP client
 Name: %{name}
 Version: %{version}
 Release: %{release}
-Source0: %{name}_%{unmangled_version}.tar.gz
+Source0: %{name}_%{unmangled_version}.orig.tar.gz
 License: UNKNOWN
 Group: Development/Libraries
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-buildroot

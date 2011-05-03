@@ -282,4 +282,4 @@ class Workitem(object):
 
     def dump(self):
         "A useful and consistent dump format"
-        return json.dumps(wid.to_h(), sort_keys=True, indent=4)
+        return json.dumps(self._h, sort_keys=True, indent=4)

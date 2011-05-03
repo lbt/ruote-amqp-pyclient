@@ -1,6 +1,6 @@
 %define name python-ruote-amqp
-%define version 2.0.0
-%define unmangled_version 2.0.0
+%define version 2.0.1
+%define unmangled_version 2.0.1
 %define release 1
 
 %define python python%{?__python_ver}

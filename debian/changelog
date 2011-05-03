@@ -1,3 +1,9 @@
+python-ruote-amqp (2.0.1-1) unstable; urgency=low
+
+  * Fix error in Workitem.dump()
+
+ -- David Greaves <david@dgreaves.com>  Wed, 04 May 2011 00:34:30 +0100
+
 python-ruote-amqp (2.0.0-1) unstable; urgency=low
 
   * Use properties extensively. This is an API break

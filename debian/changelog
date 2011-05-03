@@ -1,4 +1,4 @@
-python-ruote-amqp (0.2.1-1) unstable; urgency=low
+python-ruote-amqp (2.0.0-1) unstable; urgency=low
 
   * Use properties extensively. This is an API break
   * Update to new numbering

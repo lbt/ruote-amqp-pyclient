@@ -85,7 +85,7 @@ class Participant(object):
                # errors back via a workitem
                # wi.set_error(e)
                self.workitem.Exception = "%s" % e
-               self.workitem.result = None
+               self.workitem.result = False
 
           if not self.workitem.forget:
                self.reply_to_engine()

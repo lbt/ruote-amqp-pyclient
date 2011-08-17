@@ -114,13 +114,15 @@ class Participant(object):
           self._running = False
 
 
-     def reply_to_engine(self):
+     def reply_to_engine(self, workitem=None):
           """
           When the job is complete the workitem is passed back to the
           ruote engine.  The consume() method should set the
           workitem.result() if required.
           """
-          msg = amqp.Message(json.dumps(self.workitem.to_h()))
+          if not workitem:
+              workitem = self.workitem
+          msg = amqp.Message(json.dumps(workitem.to_h()))
           # delivery_mode=2 is persistent
           msg.properties["delivery_mode"] = 2
 

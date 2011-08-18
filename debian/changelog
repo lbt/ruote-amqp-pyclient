@@ -1,3 +1,9 @@
+python-ruote-amqp (2.1.0-1) unstable; urgency=low
+
+  * Allow a workitem to be passed in the reply_to_engine()
+
+ -- Islam Amer <islam.amer@nokia.com>  Fri, 19 Aug 2011 02:23:58 +0300
+
 python-ruote-amqp (2.0.1-2) unstable; urgency=low
 
   * workitem __result__ is  False when an exception is raised

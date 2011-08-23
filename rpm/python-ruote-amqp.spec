@@ -1,7 +1,3 @@
-%define name python-ruote-amqp
-%define version 2.1.0
-%define release 1
-
 %define python python%{?__python_ver}
 %define __python /usr/bin/%{python}
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
@@ -9,9 +5,9 @@
 
 
 Summary: Python Ruote/AMQP client
-Name: %{name}
-Version: %{version}
-Release: %{release}
+Name: python-ruote-amqp
+Version: 2.1.0
+Release: 1
 Source0: %{name}_%{version}.orig.tar.gz
 License: UNKNOWN
 Group: Development/Libraries
@@ -26,7 +22,7 @@ Url: http://github.com/lbt/ruote-amqp-pyclient
 UNKNOWN
 
 %prep
-%setup -n %{name}-%{unmangled_version} -n %{name}-%{unmangled_version}
+%setup -n %{name}-%{version}
 
 %build
 python setup.py build

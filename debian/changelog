@@ -1,3 +1,9 @@
+python-ruote-amqp (2.1.1-1) unstable; urgency=low
+
+  * Added setter to Workitem.forget
+
+ -- Pami Ketolainen <ext-pami.o.ketolainen@nokia.com>  Mon, 29 Aug 2011 14:54:43 +0300
+
 python-ruote-amqp (2.1.0-1) unstable; urgency=low
 
   * Allow a workitem to be passed in the reply_to_engine()

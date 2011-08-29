@@ -195,6 +195,11 @@ class Workitem(object):
         else:
             return False
 
+    @forget.setter
+    def forget(self, value):
+        assert isinstance(value, bool)
+        self.params.forget = value
+
     def __eq__ (self, other):
         "Warning : equality is based on fei and not on payload !"
         if isinstance(other, type(self)): return false

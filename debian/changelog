@@ -1,3 +1,9 @@
+python-ruote-amqp (2.1.2-1) lucid; urgency=low
+
+  * Made Workitem.error property work
+
+ -- Richard Braakman <ext-richard.braakman@nokia.com>  Wed, 07 Sep 2011 14:35:03 +0300
+
 python-ruote-amqp (2.1.1-1) unstable; urgency=low
 
   * Added setter to Workitem.forget

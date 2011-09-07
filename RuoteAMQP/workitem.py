@@ -263,7 +263,7 @@ class Workitem(object):
         return self._h['fields']['__timed_out__']
 
     @property
-    def error(self, err):
+    def error(self):
         "Shortcut for wi.fields['__error__']"
         return self._h['fields']['__error__']
 

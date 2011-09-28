@@ -19,43 +19,43 @@ from workitem import Workitem
 import AIR
 
 try:
-     import json
+    import json
 except ImportError:
-     import simplejson as json
+    import simplejson as json
 
 import threading
 
 class Launcher(AIR.AMQPServer):
-     """
-     A Launcher will launch a Ruote process.
+    """
+    A Launcher will launch a Ruote process.
 
-     Workitems arrive via AMQP, are processed and returned to the Ruote engine.
+    Workitems arrive via AMQP, are processed and returned to the Ruote engine.
 
-     Cancel is not yet implemented.
-     """
+    Cancel is not yet implemented.
+    """
 
-     def __init__(self,*args, **kwargs):
-          super(Launcher, self).__init__(*args, **kwargs)
+    def __init__(self,*args, **kwargs):
+        super(Launcher, self).__init__(*args, **kwargs)
 
-#          # Currently ruote-amqp uses the anonymous direct exchange
-#          self.chan.exchange_declare(exchange="", type="direct", durable=True,
-#                                     auto_delete=False)
+#        # Currently ruote-amqp uses the anonymous direct exchange
+#        self.chan.exchange_declare(exchange="", type="direct", durable=True,
+#                              auto_delete=False)
 
-     def launch(self, process, fields=None, variables=None):
-          """
-          Launch a process definition
-          """
-          # FIXME : Raise exception if fields not dict
-          pdef = {
-               "definition": process,
-               "fields" : fields,
-               "variables" : variables
-               }
-          # Encode the message as json
-          msg = amqp.Message(json.dumps(pdef))
-          # delivery_mode=2 is persistent
-          msg.properties["delivery_mode"] = 2 
-          
-          # Publish the message.
-          self.chan.basic_publish(msg, exchange='',
-                                  routing_key='ruote_workitems')
+    def launch(self, process, fields=None, variables=None):
+        """
+        Launch a process definition
+        """
+        # FIXME : Raise exception if fields not dict
+        pdef = {
+            "definition": process,
+            "fields" : fields,
+            "variables" : variables
+            }
+        # Encode the message as json
+        msg = amqp.Message(json.dumps(pdef))
+        # delivery_mode=2 is persistent
+        msg.properties["delivery_mode"] = 2
+
+        # Publish the message.
+        self.chan.basic_publish(msg, exchange='',
+                            routing_key='ruote_workitems')

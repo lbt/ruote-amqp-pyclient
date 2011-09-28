@@ -18,133 +18,133 @@ import sys, traceback
 from amqplib import client_0_8 as amqp
 from workitem import Workitem
 try:
-     import json
+    import json
 except ImportError:
-     import simplejson as json
+    import simplejson as json
 
 class Participant(object):
-     """
-     A Participant will do work in a Ruote process. Participant is
-     essentially abstract and must be subclassed to provide a useful
-     consume() method.
+    """
+    A Participant will do work in a Ruote process. Participant is
+    essentially abstract and must be subclassed to provide a useful
+    consume() method.
 
-     Workitems arrive via AMQP, are processed and returned to the Ruote engine.
+    Workitems arrive via AMQP, are processed and returned to the Ruote engine.
 
-     Cancel is not yet implemented.
-     """
+    Cancel is not yet implemented.
+    """
 
-     def __init__(self, ruote_queue,
-                  amqp_host = "localhost", amqp_user = "ruote",
-                  amqp_pass = "ruote", amqp_vhost = "ruote"):
+    def __init__(self, ruote_queue,
+               amqp_host = "localhost", amqp_user = "ruote",
+               amqp_pass = "ruote", amqp_vhost = "ruote"):
 
-          self._conn = amqp.Connection(host=amqp_host, userid=amqp_user,
-                                       password=amqp_pass, virtual_host=amqp_vhost,
-                                       insist=False)
+        self._conn = amqp.Connection(host=amqp_host, userid=amqp_user,
+                                password=amqp_pass, virtual_host=amqp_vhost,
+                                insist=False)
 
-          self._chan = self._conn.channel()
+        self._chan = self._conn.channel()
 
-          # Declare a shareable queue for the participant
-          self._chan.queue_declare(queue=ruote_queue, durable=True,
-                                   exclusive=False, auto_delete=False)
+        # Declare a shareable queue for the participant
+        self._chan.queue_declare(queue=ruote_queue, durable=True,
+                            exclusive=False, auto_delete=False)
 
-          # Currently ruote-amqp uses the anonymous direct exchange
-          self._chan.exchange_declare(exchange="", type="direct", durable=True,
-                                      auto_delete=False)
+        # Currently ruote-amqp uses the anonymous direct exchange
+        self._chan.exchange_declare(exchange="", type="direct", durable=True,
+                               auto_delete=False)
 
-          # bind our queue using a routing key of our queue name
-          self._chan.queue_bind(queue=ruote_queue, exchange="",
-                                routing_key=ruote_queue)
+        # bind our queue using a routing key of our queue name
+        self._chan.queue_bind(queue=ruote_queue, exchange="",
+                          routing_key=ruote_queue)
 
-          # and set a callback for workitems
-          self._chan.basic_consume(queue=ruote_queue, no_ack=True,
-                                   callback=self.workitem_callback)
+        # and set a callback for workitems
+        self._chan.basic_consume(queue=ruote_queue, no_ack=True,
+                            callback=self.workitem_callback)
 
-     def workitem_callback(self, msg):
-          "This is where a workitem message is handled"
+    def workitem_callback(self, msg):
+        "This is where a workitem message is handled"
 
-          try:
-               self.workitem = Workitem(msg.body)
-          except ValueError, e:
-               print "Exception decoding incoming json"
-               print '-'*60
-               print msg.body
-               print '-'*60
-               print "Note: Now re-raising exception"
-               raise e
+        try:
+            self.workitem = Workitem(msg.body)
+        except ValueError, e:
+            print "Exception decoding incoming json"
+            print '-'*60
+            print msg.body
+            print '-'*60
+            print "Note: Now re-raising exception"
+            raise e
 
-          try:
-               self.consume()
-          except Exception, e:
-               # This should be configureable:
-               print "Exception"
-               print '-'*60
-               traceback.print_exc(file=sys.stderr)
-               print '-'*60
-               print "Note: for information only. Workitem returning with result=false"
-               # And this should be the 'standardised' way of passing
-               # errors back via a workitem
-               # wi.set_error(e)
-               self.workitem.Exception = "%s" % e
-               self.workitem.result = False
+        try:
+            self.consume()
+        except Exception, e:
+            # This should be configureable:
+            print "Exception"
+            print '-'*60
+            traceback.print_exc(file=sys.stderr)
+            print '-'*60
+            print "Note: for information only. Workitem returning with result=false"
+            # And this should be the 'standardised' way of passing
+            # errors back via a workitem
+            # wi.set_error(e)
+            self.workitem.Exception = "%s" % e
+            self.workitem.result = False
 
-          if not self.workitem.forget:
-               self.reply_to_engine()
+        if not self.workitem.forget:
+            self.reply_to_engine()
 
-     def consume():
-          """
-          Override the consume() method in a subclass to do useful work.
-          The workitem attribute contains a Workitem.
-          """
-          pass
+    def consume():
+        """
+        Override the consume() method in a subclass to do useful work.
+        The workitem attribute contains a Workitem.
+        """
+        pass
 
-     def run(self):
-          """
-          Currently an infinite loop waiting for messages on the AMQP channel.
-          """
-          self._running = True
-          while self._running:
-               self._chan.wait()
-          self._chan.basic_cancel()
-          self._chan.close()
-          self._conn.close()
-
-
-     def finish(self):
-          "Closes channel and connection"
-          self._running = False
+    def run(self):
+        """
+        Currently an infinite loop waiting for messages on the AMQP channel.
+        """
+        self._running = True
+        while self._running:
+            self._chan.wait()
+        self._chan.basic_cancel()
+        self._chan.close()
+        self._conn.close()
 
 
-     def reply_to_engine(self, workitem=None):
-          """
-          When the job is complete the workitem is passed back to the
-          ruote engine.  The consume() method should set the
-          workitem.result() if required.
-          """
-          if not workitem:
-              workitem = self.workitem
-          msg = amqp.Message(json.dumps(workitem.to_h()))
-          # delivery_mode=2 is persistent
-          msg.properties["delivery_mode"] = 2
+    def finish(self):
+        "Closes channel and connection"
+        self._running = False
 
-          # Publish the message.
-          # Notice that this is sent to the anonymous/'' exchange (which is
-          # different to 'amq.direct') with a routing_key for the queue
-          self._chan.basic_publish(msg, exchange='', routing_key='ruote_workitems')
 
-     def register(self, name, options):
-          """
-          Relies on the engine supporting the "engine_command"
-          participant.
-          """
-          if 'position' not in options:
-              options['position'] = -2
-          command = {
-               "register": "RuoteAMQP::Participant",
-               "name" : name,
-               "options" : options
-               }
-          # Encode the message as json
-          msg = amqp.Message(json.dumps(command))
-          # delivery_mode=2 is persistent
-          msg.properties["delivery_mode"] = 2
-          self._chan.basic_publish(msg, exchange='', routing_key='ruote_workitems')
+    def reply_to_engine(self, workitem=None):
+        """
+        When the job is complete the workitem is passed back to the
+        ruote engine.  The consume() method should set the
+        workitem.result() if required.
+        """
+        if not workitem:
+            workitem = self.workitem
+        msg = amqp.Message(json.dumps(workitem.to_h()))
+        # delivery_mode=2 is persistent
+        msg.properties["delivery_mode"] = 2
+
+        # Publish the message.
+        # Notice that this is sent to the anonymous/'' exchange (which is
+        # different to 'amq.direct') with a routing_key for the queue
+        self._chan.basic_publish(msg, exchange='', routing_key='ruote_workitems')
+
+    def register(self, name, options):
+        """
+        Relies on the engine supporting the "engine_command"
+        participant.
+        """
+        if 'position' not in options:
+            options['position'] = -2
+        command = {
+            "register": "RuoteAMQP::Participant",
+            "name" : name,
+            "options" : options
+            }
+        # Encode the message as json
+        msg = amqp.Message(json.dumps(command))
+        # delivery_mode=2 is persistent
+        msg.properties["delivery_mode"] = 2
+        self._chan.basic_publish(msg, exchange='', routing_key='ruote_workitems')

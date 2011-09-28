@@ -13,9 +13,7 @@
 #~ You should have received a copy of the GNU General Public License
 #~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, traceback
 from amqplib import client_0_8 as amqp
-from workitem import Workitem
 import AIR
 
 try:
@@ -23,7 +21,6 @@ try:
 except ImportError:
     import simplejson as json
 
-import threading
 
 class Launcher(AIR.AMQPServer):
     """
@@ -34,7 +31,7 @@ class Launcher(AIR.AMQPServer):
     Cancel is not yet implemented.
     """
 
-    def __init__(self,*args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(Launcher, self).__init__(*args, **kwargs)
 
 #        # Currently ruote-amqp uses the anonymous direct exchange

@@ -16,7 +16,7 @@
 
 import sys, traceback
 from amqplib import client_0_8 as amqp
-from workitem import Workitem
+from RuoteAMQP.workitem import Workitem
 try:
     import json
 except ImportError:
@@ -36,6 +36,9 @@ class Participant(object):
     def __init__(self, ruote_queue,
                amqp_host = "localhost", amqp_user = "ruote",
                amqp_pass = "ruote", amqp_vhost = "ruote"):
+
+        self.workitem = None
+        self._running = None
 
         self._conn = amqp.Connection(host=amqp_host, userid=amqp_user,
                                 password=amqp_pass, virtual_host=amqp_vhost,
@@ -64,33 +67,34 @@ class Participant(object):
 
         try:
             self.workitem = Workitem(msg.body)
-        except ValueError, e:
+        except ValueError, exobj:
             print "Exception decoding incoming json"
             print '-'*60
             print msg.body
             print '-'*60
             print "Note: Now re-raising exception"
-            raise e
+            raise exobj
 
         try:
             self.consume()
-        except Exception, e:
+        except Exception, exobj:
             # This should be configureable:
             print "Exception"
             print '-'*60
             traceback.print_exc(file=sys.stderr)
             print '-'*60
-            print "Note: for information only. Workitem returning with result=false"
+            print "Note: for information only. Workitem returning with "\
+                    "result=false"
             # And this should be the 'standardised' way of passing
             # errors back via a workitem
             # wi.set_error(e)
-            self.workitem.Exception = "%s" % e
+            self.workitem.Exception = "%s" % exobj
             self.workitem.result = False
 
         if not self.workitem.forget:
             self.reply_to_engine()
 
-    def consume():
+    def consume(self):
         """
         Override the consume() method in a subclass to do useful work.
         The workitem attribute contains a Workitem.
@@ -129,7 +133,8 @@ class Participant(object):
         # Publish the message.
         # Notice that this is sent to the anonymous/'' exchange (which is
         # different to 'amq.direct') with a routing_key for the queue
-        self._chan.basic_publish(msg, exchange='', routing_key='ruote_workitems')
+        self._chan.basic_publish(msg, exchange='',
+                routing_key='ruote_workitems')
 
     def register(self, name, options):
         """
@@ -147,4 +152,5 @@ class Participant(object):
         msg = amqp.Message(json.dumps(command))
         # delivery_mode=2 is persistent
         msg.properties["delivery_mode"] = 2
-        self._chan.basic_publish(msg, exchange='', routing_key='ruote_workitems')
+        self._chan.basic_publish(msg, exchange='',
+                routing_key='ruote_workitems')

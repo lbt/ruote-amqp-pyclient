@@ -1,3 +1,17 @@
+python-ruote-amqp (2.3.1-1) unstable; urgency=low
+
+  * Merged 2.3.0 and 2.2.1 branches
+  * Merged Ed's patch for amqp 0.9 compatibility
+
+ -- Richard Braakman <ext-richard.braakman@nokia.com>  Fri, 28 Oct 2011 16:09:25 +0300
+
+python-ruote-amqp (2.3.0-1) unstable; urgency=low
+
+  * Changes the error handling relationship and needs ruote-amqp 2.2.0.1
+    with the error patch
+
+ -- David Greaves <david@dgreaves.com>  Sat, 01 Oct 2011 23:28:28 +0000
+
 python-ruote-amqp (2.2.1-1) experimental; urgency=low
 
   * Logging participant_name , wfid, workflow_name when an exception is raised

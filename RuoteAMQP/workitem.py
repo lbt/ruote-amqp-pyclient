@@ -270,15 +270,26 @@ class Workitem(object):
         "Shortcut for wi.fields['__timed_out__']"
         return self._h['fields']['__timed_out__']
 
+    # Note this is different to the ruote internal workitem which
+    # accesses the private wi.fields.__error__
+    # Here we use a specific ruote-amqp value in the workitem.
     @property
     def error(self):
-        "Shortcut for wi.fields['__error__']"
-        return self._h['fields']['__error__']
+        """
+        Reads any previously set value.
+        
+        Accesses the ruote-AMQP specific wi.['__error__']
+        """
+        return self._h['error']
 
     @error.setter
     def error(self, err):
-        "Shortcut for wi.fields['__error__']"
-        self._h['fields']['__error__']=err
+        """
+        Cause a process level error if the Workitem is returned.
+        
+        Shortcut for the ruote-AMQP specific wi.['__error__']
+        """
+        self._h['error'] = err
 
     @property
     def params(self):

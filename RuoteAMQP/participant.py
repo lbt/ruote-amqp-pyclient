@@ -44,9 +44,10 @@ class ConsumerThread(Thread):
                      self.__participant.workitem.wf_name)
             print '-'*80
             traceback.print_exc(file=sys.stderr)
-            print '-'*80
-            print "Note: for information only. Workitem returning with "\
-                    "result=false"
+            print '-'*78
+            print "Note: for information only. Participant remains functional.\n" \
+                  "      Error is being signalled to the workflow (unless this \n" \
+                  "      workitem is 'forgotten')."
             self.exception = exobj
 
 class Participant(object):
@@ -118,8 +119,13 @@ class Participant(object):
         consumer.start()
         consumer.join()
         if consumer.exception:
+            # Note: the mechanism below is different than the one
+            # ruote-beanstalk uses. That sends the message in an array
+            # where the first element indicates the message type
+            # (workitem or error)
+
+            # TODO: it might be helpful to transmit also the stack trace
             self.workitem.error = "%s" % consumer.exception
-            self.workitem.result = False
 
         if not self.workitem.forget:
             self.reply_to_engine()

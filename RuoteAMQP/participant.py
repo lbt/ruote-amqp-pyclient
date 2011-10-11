@@ -83,11 +83,11 @@ class Participant(object):
                     queue=self._queue, durable=True, exclusive=False,
                     auto_delete=False)
             # Currently ruote-amqp uses the anonymous direct exchange
-            self._chan.exchange_declare(
-                    exchange="", type="direct", durable=True, auto_delete=False)
+            #self._chan.exchange_declare(
+            #        exchange="", type="direct", durable=True, auto_delete=False)
             # Bind our queue using a routing key of our queue name
-            self._chan.queue_bind(
-                    queue=self._queue, exchange="", routing_key=self._queue)
+            #self._chan.queue_bind(
+            #        queue=self._queue, exchange="", routing_key=self._queue)
             # and set a callback for workitems
             self._consumer_tag = self._chan.basic_consume(
                     queue=self._queue, no_ack=False,

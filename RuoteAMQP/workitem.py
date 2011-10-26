@@ -128,6 +128,14 @@ class Workitem(object):
         return self._fei.to_storage_id()
 
     @property
+    def wf_name(self):
+        """
+        Returns the "workflow name" (generic workflow name) of
+        the process which issued this workitem.
+        """
+        return self._h['wf_name']
+
+    @property
     def wfid(self):
         """
         Returns the "workflow instance id" (unique process instance id) of

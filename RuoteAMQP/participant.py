@@ -37,10 +37,14 @@ class ConsumerThread(Thread):
             self.__participant.consume()
         except Exception, exobj:
             # This should be configureable:
-            print "Exception in consume()"
-            print '-'*60
+            print "Exception in participant %s" % \
+                    (self.__participant.workitem.participant_name)
+            print "while handling instance %s of process %s " % \
+                    (self.__participant.workitem.wfid,
+                     self.__participant.workitem.wf_name)
+            print '-'*80
             traceback.print_exc(file=sys.stderr)
-            print '-'*60
+            print '-'*80
             print "Note: for information only. Workitem returning with "\
                     "result=false"
             self.exception = exobj

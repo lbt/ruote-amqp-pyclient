@@ -1,3 +1,12 @@
+python-ruote-amqp (2.2.1-1) experimental; urgency=low
+
+  * Logging participant_name , wfid, workflow_name when an exception is raised
+    will make it easier to debug them
+  * Add new workitem property getter for wf_name
+  * Fixes PMO#275074, PMO#285097
+
+ -- Islam Amer <islam.amer@nokia.com>  Thu, 27 Oct 2011 13:37:08 +0300
+
 python-ruote-amqp (2.2.0-1) lucid; urgency=low
 
   * Participant shutdown fixes

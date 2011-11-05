@@ -93,13 +93,16 @@ class Participant(object):
         """Open and initialize the amqp channel."""
         if self._chan is None or not self._chan.is_open:
             self._chan = connection.channel()
+            # set qos option on this channel with prefetch count 1 whole message
+            # of any size
+            self._chan.basic_qos(0, 1, False)
             # Declare a shareable queue for the participant
             self._chan.queue_declare(
                     queue=self._queue, durable=True, exclusive=False,
                     auto_delete=False)
             # Currently ruote-amqp uses the anonymous direct exchange
             #self._chan.exchange_declare(
-            #        exchange="", type="direct", durable=True, auto_delete=False)
+            #       exchange="", type="direct", durable=True, auto_delete=False)
             # Bind our queue using a routing key of our queue name
             #self._chan.queue_bind(
             #        queue=self._queue, exchange="", routing_key=self._queue)
@@ -123,8 +126,6 @@ class Participant(object):
             print_block(msg.body)
             print "Note: Now re-raising exception"
             raise exobj
-        # Acknowledge the message as received
-        self._chan.basic_ack(tag)
 
         # Launch consume() in separate thread so it doesn't get interrupted by
         # signals
@@ -139,6 +140,9 @@ class Participant(object):
 
             # TODO: it might be helpful to transmit also the stack trace
             self.workitem.error = format_exception(consumer.exception)
+
+        # Acknowledge the message as received
+        self._chan.basic_ack(tag)
 
         if not self.workitem.forget:
             self.reply_to_engine()

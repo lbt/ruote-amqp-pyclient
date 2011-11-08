@@ -14,7 +14,6 @@
 #~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from amqplib import client_0_8 as amqp
-import AIR
 
 try:
     import json
@@ -22,7 +21,7 @@ except ImportError:
     import simplejson as json
 
 
-class Launcher(AIR.AMQPServer):
+class Launcher(object):
     """
     A Launcher will launch a Ruote process.
 
@@ -31,8 +30,27 @@ class Launcher(AIR.AMQPServer):
     Cancel is not yet implemented.
     """
 
-    def __init__(self, *args, **kwargs):
-        super(Launcher, self).__init__(*args, **kwargs)
+    def __init__(self,
+                 amqp_host = "localhost", amqp_user = "boss",
+                 amqp_pass = "boss", amqp_vhost = "boss",
+                 conn = None):
+        if conn != None:
+            self.conn = conn
+        else:
+            self.host = amqp_host
+            self.user = amqp_user
+            self.pw = amqp_pass
+            self.vhost = amqp_vhost
+            self.conn = amqp.Connection(host=self.host,
+                                        userid=self.user,
+                                        password=self.pw,
+                                        virtual_host=self.vhost,
+                                        insist=False)
+        if self.conn == None:
+            raise Exception("No connection")
+        self.chan = self.conn.channel()
+        if self.chan == None:
+            raise Exception("No channel")
 
 #        # Currently ruote-amqp uses the anonymous direct exchange
 #        self.chan.exchange_declare(exchange="", type="direct", durable=True,

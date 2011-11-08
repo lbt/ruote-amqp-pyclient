@@ -60,7 +60,10 @@ class Launcher(object):
         """
         Launch a process definition
         """
-        # FIXME : Raise exception if fields not dict
+        if fields and not isinstance(fields, dict):
+            raise TypeError("fields should be type dict")
+        if variables and not isinstance(variables, dict):
+            raise TypeError("variables should be type dict")
         pdef = {
             "definition": process,
             "fields" : fields,

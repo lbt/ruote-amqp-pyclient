@@ -17,6 +17,7 @@
 from __future__ import with_statement
 import sys, traceback
 from threading import Thread
+from urllib2 import HTTPError
 from amqplib import client_0_8 as amqp
 from RuoteAMQP.workitem import Workitem
 
@@ -24,6 +25,15 @@ try:
     import json
 except ImportError:
     import simplejson as json
+
+def format_exception(exc):
+    """Formats exception to more informative string based on exception type."""
+    if isinstance(exc, HTTPError):
+        errmsg = "HTTPError: %d %s" % (exc.getcode(), exc.geturl())
+    else:
+        errmsg = str(exc)
+    return errmsg
+
 
 class ConsumerThread(Thread):
     """Thread for running the Participant.consume()"""
@@ -125,7 +135,7 @@ class Participant(object):
             # (workitem or error)
 
             # TODO: it might be helpful to transmit also the stack trace
-            self.workitem.error = "%s" % consumer.exception
+            self.workitem.error = format_exception(consumer.exception)
 
         if not self.workitem.forget:
             self.reply_to_engine()

@@ -6,7 +6,7 @@
 
 Summary: Python Ruote/AMQP client
 Name: python-ruote-amqp
-Version: 2.3.1
+Version: 2.3.2
 Release: 1
 Source0: %{name}_%{version}.orig.tar.gz
 License: UNKNOWN

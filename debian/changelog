@@ -1,3 +1,10 @@
+python-ruote-amqp (2.3.2-1) unstable; urgency=low
+
+  * More informative messages from sertain exceptions (PMO#288873)
+  * Removed AIR dependency as proposed by Islam (PMO#288873)
+
+ -- Pami Ketolainen <ext-pami.o.ketolainen@nokia.com>  Tue, 08 Nov 2011 19:18:48 +0200
+
 python-ruote-amqp (2.3.1-1) unstable; urgency=low
 
   * Merged 2.3.0 and 2.2.1 branches

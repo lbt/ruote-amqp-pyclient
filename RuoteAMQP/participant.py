@@ -34,6 +34,13 @@ def format_exception(exc):
         errmsg = str(exc)
     return errmsg
 
+def print_block(msg):
+    """Print message in a block with separator lines at begining and end."""
+    print "-" * 78
+    print msg
+    print "-" * 78
+
+
 
 class ConsumerThread(Thread):
     """Thread for running the Participant.consume()"""
@@ -52,9 +59,7 @@ class ConsumerThread(Thread):
             print "while handling instance %s of process %s " % \
                     (self.__participant.workitem.wfid,
                      self.__participant.workitem.wf_name)
-            print '-'*80
-            traceback.print_exc(file=sys.stderr)
-            print '-'*78
+            print_block(traceback.format_exc())
             print "Note: for information only. Participant remains functional.\n" \
                   "      Error is being signalled to the workflow (unless this \n" \
                   "      workitem is 'forgotten')."
@@ -115,9 +120,7 @@ class Participant(object):
             # Reject and don't requeue the message
             self._chan.basic_reject(tag, False)
             print "Exception decoding incoming json"
-            print '-'*60
-            print msg.body
-            print '-'*60
+            print_block(msg.body)
             print "Note: Now re-raising exception"
             raise exobj
         # Acknowledge the message as received

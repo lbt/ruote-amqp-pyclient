@@ -1,7 +1,9 @@
 python-ruote-amqp (2.3.2-1) unstable; urgency=low
 
-  * More informative messages from sertain exceptions (PMO#288873)
+  * More informative messages from certain exceptions (PMO#288873)
   * Removed AIR dependency as proposed by Islam (PMO#288873)
+  * [Islam] Moved amqp ack to after job is done (PMO#289294)
+  * [Islam] set QOS on amqp channel to prefetch only one message (PMO#289294)
 
  -- Pami Ketolainen <ext-pami.o.ketolainen@nokia.com>  Tue, 08 Nov 2011 19:18:48 +0200
 

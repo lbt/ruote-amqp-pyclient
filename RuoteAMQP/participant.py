@@ -14,6 +14,8 @@
 #~ You should have received a copy of the GNU General Public License
 #~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+""" Abstract participant class """
+
 from __future__ import with_statement
 import sys, traceback
 from threading import Thread
@@ -26,13 +28,35 @@ try:
 except ImportError:
     import simplejson as json
 
+def format_ruby_backtrace(trace):
+    """Formats a python traceback so that a ruby Exception accepts it 
+       as a backtrace."""
+    return ["%s:%d: in `%s %s'" % (item[0], item[1], item[2], item[3]) \
+            for item in trace]
+
 def format_exception(exc):
     """Formats exception to more informative string based on exception type."""
     if isinstance(exc, HTTPError):
-        errmsg = "HTTPError: %d %s" % (exc.getcode(), exc.geturl())
+        exc_str = "HTTPError: %d %s" % (exc.getcode(), exc.geturl())
+    elif isinstance(exc, EnvironmentError):
+        if exc.filename:
+            exc_str = "{0}({1}): {2} {3}".format(exc.__class__.__name__, \
+                                                 exc.errno, exc.filename, \
+                                                 exc.strerror)
+        elif exc.errno and exc.strerror:
+            exc_str = "{0}({1}): {2} {3}".format(exc.__class__.__name__, \
+                                                 exc.errno, exc.filename, \
+                                                 exc.strerror)
+        else:
+            exc_str = "{0}: {1}".format(exc.__class__.__name__, \
+                                        ",".join(exc.args))
+    # osc exception don't set args correctly
+    elif hasattr(exc, "msg"):
+            exc_str = "{0}: {1}".format(exc.__class__.__name__, exc.msg)
     else:
-        errmsg = str(exc)
-    return errmsg
+        exc_str = "{0}: {1}".format(exc.__class__.__name__, \
+                                    ",".join(exc.args))
+    return exc_str
 
 def print_block(msg):
     """Print message in a block with separator lines at begining and end."""
@@ -40,14 +64,13 @@ def print_block(msg):
     print msg
     print "-" * 78
 
-
-
 class ConsumerThread(Thread):
     """Thread for running the Participant.consume()"""
     def __init__(self, participant):
         super(ConsumerThread, self).__init__()
         self.__participant = participant
         self.exception = None
+        self.trace = None
 
     def run(self):
         try:
@@ -59,11 +82,13 @@ class ConsumerThread(Thread):
             print "while handling instance %s of process %s " % \
                     (self.__participant.workitem.wfid,
                      self.__participant.workitem.wf_name)
+
             print_block(traceback.format_exc())
-            print "Note: for information only. Participant remains functional.\n" \
-                  "      Error is being signalled to the workflow (unless this \n" \
-                  "      workitem is 'forgotten')."
+            print "Note: for information only. Participant remains functional."\
+                  "\n      Error is being signalled to the workflow (unless" \
+                  "\n      this workitem is 'forgotten')."
             self.exception = exobj
+            self.trace = traceback.extract_tb(sys.exc_traceback)
 
 class Participant(object):
     """
@@ -138,8 +163,8 @@ class Participant(object):
             # where the first element indicates the message type
             # (workitem or error)
 
-            # TODO: it might be helpful to transmit also the stack trace
             self.workitem.error = format_exception(consumer.exception)
+            self.workitem.trace = format_ruby_backtrace(consumer.trace)
 
         # Acknowledge the message as received
         self._chan.basic_ack(tag)

@@ -291,6 +291,25 @@ class Workitem(object):
         """
         self._h['error'] = err
 
+    # ruote-amqp trace
+    @property
+    def trace(self):
+        """
+        Reads any previously set value.
+
+        Accesses the ruote-AMQP specific wi.['__trace__']
+        """
+        return self._h['trace']
+
+    @trace.setter
+    def trace(self, trace):
+        """
+        Sets a backtrace.
+ 
+        Shortcut for the ruote-AMQP specific wi.['__trace__']
+        """
+        self._h['trace'] = trace
+
     @property
     def params(self):
         """

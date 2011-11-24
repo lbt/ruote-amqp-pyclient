@@ -297,7 +297,7 @@ class Workitem(object):
         """
         Reads any previously set value.
 
-        Accesses the ruote-AMQP specific wi.['__trace__']
+        Accesses the ruote-AMQP specific wi.['trace']
         """
         return self._h['trace']
 
@@ -306,7 +306,7 @@ class Workitem(object):
         """
         Sets a backtrace.
  
-        Shortcut for the ruote-AMQP specific wi.['__trace__']
+        Shortcut for the ruote-AMQP specific wi.['trace']
         """
         self._h['trace'] = trace
 

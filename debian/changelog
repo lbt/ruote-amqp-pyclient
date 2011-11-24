@@ -1,3 +1,10 @@
+python-ruote-amqp (2.3.3-1) unstable; urgency=low
+
+  * Even more information from exceptions
+  * Convey traceback in the workitem
+
+ -- Islam Amer <islam.amer@nokia.com>  Thu, 24 Nov 2011 23:56:47 +0200
+
 python-ruote-amqp (2.3.2-1) unstable; urgency=low
 
   * More informative messages from certain exceptions (PMO#288873)

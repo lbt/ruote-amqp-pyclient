@@ -38,6 +38,8 @@ def format_exception(exc):
     """Formats exception to more informative string based on exception type."""
     if isinstance(exc, HTTPError):
         exc_str = "HTTPError: %d %s" % (exc.getcode(), exc.geturl())
+    # Catching EnvironmentError means we cover IOError, OSError, URLError
+    # http://docs.python.org/library/exceptions.html#exceptions.EnvironmentError
     elif isinstance(exc, EnvironmentError):
         if exc.filename:
             exc_str = "{0}({1}): {2} {3}".format(exc.__class__.__name__, \
@@ -45,17 +47,18 @@ def format_exception(exc):
                                                  exc.strerror)
         elif exc.errno and exc.strerror:
             exc_str = "{0}({1}): {2} {3}".format(exc.__class__.__name__, \
-                                                 exc.errno, exc.filename, \
-                                                 exc.strerror)
+                                                 exc.errno, exc.strerror)
         else:
             exc_str = "{0}: {1}".format(exc.__class__.__name__, \
                                         ",".join(exc.args))
-    # osc exception don't set args correctly
+    # osc exceptions don't set args and message correctly so str(exc) contains
+    # only the exception class name. However it has a msg attribute which has 
+    # sensible contents so use that
     elif hasattr(exc, "msg"):
             exc_str = "{0}: {1}".format(exc.__class__.__name__, exc.msg)
     else:
         exc_str = "{0}: {1}".format(exc.__class__.__name__, \
-                                    ",".join(exc.args))
+                                    str(exc))
     return exc_str
 
 def print_block(msg):

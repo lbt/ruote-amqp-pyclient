@@ -1,3 +1,9 @@
+python-ruote-amqp (2.3.4-1) unstable; urgency=low
+
+  * Fix exceptions from participant.format_exception() (PMO#294391)
+
+ -- Pami Ketolainen <ext-pami.o.ketolainen@nokia.com>  Fri, 09 Dec 2011 13:54:43 +0200
+
 python-ruote-amqp (2.3.3-1) unstable; urgency=low
 
   * Even more information from exceptions

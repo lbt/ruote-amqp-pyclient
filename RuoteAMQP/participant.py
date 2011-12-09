@@ -37,7 +37,9 @@ def format_ruby_backtrace(trace):
 def format_exception(exc):
     """Formats exception to more informative string based on exception type."""
     if isinstance(exc, HTTPError):
-        exc_str = "HTTPError: %d %s" % (exc.getcode(), exc.geturl())
+        # Python bug, HTTPError does not always have url attribute and geturl()
+        # fails
+        exc_str = "HTTPError: %d %s" % (exc.getcode(), exc.filename)
     # Catching EnvironmentError means we cover IOError, OSError, URLError
     # http://docs.python.org/library/exceptions.html#exceptions.EnvironmentError
     elif isinstance(exc, EnvironmentError):
@@ -46,7 +48,7 @@ def format_exception(exc):
                                                  exc.errno, exc.filename, \
                                                  exc.strerror)
         elif exc.errno and exc.strerror:
-            exc_str = "{0}({1}): {2} {3}".format(exc.__class__.__name__, \
+            exc_str = "{0}({1}): {2}".format(exc.__class__.__name__, \
                                                  exc.errno, exc.strerror)
         else:
             exc_str = "{0}: {1}".format(exc.__class__.__name__, \

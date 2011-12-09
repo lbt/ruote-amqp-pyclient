@@ -57,7 +57,7 @@ def format_exception(exc):
     # only the exception class name. However it has a msg attribute which has 
     # sensible contents so use that
     elif hasattr(exc, "msg"):
-            exc_str = "{0}: {1}".format(exc.__class__.__name__, exc.msg)
+        exc_str = "{0}: {1}".format(exc.__class__.__name__, exc.msg)
     else:
         exc_str = "{0}: {1}".format(exc.__class__.__name__, \
                                     str(exc))

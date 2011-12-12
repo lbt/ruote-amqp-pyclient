@@ -51,8 +51,7 @@ def format_exception(exc):
             exc_str = "{0}({1}): {2}".format(exc.__class__.__name__, \
                                                  exc.errno, exc.strerror)
         else:
-            exc_str = "{0}: {1}".format(exc.__class__.__name__, \
-                                        ",".join(exc.args))
+            exc_str = "{0}: {1}".format(exc.__class__.__name__, str(exc))
     # osc exceptions don't set args and message correctly so str(exc) contains
     # only the exception class name. However it has a msg attribute which has 
     # sensible contents so use that

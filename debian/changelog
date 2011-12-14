@@ -1,3 +1,9 @@
+python-ruote-amqp (2.3.6-1) unstable; urgency=low
+
+  * Fixed Workitem.dup() method
+
+ -- Pami Ketolainen <ext-pami.o.ketolainen@nokia.com>  Wed, 14 Dec 2011 13:51:09 +0200
+
 python-ruote-amqp (2.3.5-1) unstable; urgency=low
 
   * Fix another exception in participant.format_exception() PMO#294603

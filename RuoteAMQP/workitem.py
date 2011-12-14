@@ -151,7 +151,7 @@ class Workitem(object):
 
     def dup(self):
         """Returns a complete copy of this workitem."""
-        return Workitem(self._h)
+        return Workitem(json.dumps(self._h))
 
     @property
     def participant_name(self):

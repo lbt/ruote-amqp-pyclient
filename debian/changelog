@@ -44,7 +44,7 @@ python-ruote-amqp (2.3.0-1) unstable; urgency=low
   * Changes the error handling relationship and needs ruote-amqp 2.2.0.1
     with the error patch
 
- -- David Greaves <david@dgreaves.com>  Sat, 01 Oct 2011 23:28:28 +0000
+ -- David Greaves <david@dgreaves.com>  Thu, 27 Oct 2011 23:28:28 +0000
 
 python-ruote-amqp (2.2.1-1) experimental; urgency=low
 

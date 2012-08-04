@@ -22,6 +22,10 @@ from threading import Thread
 from urllib2 import HTTPError
 from amqplib import client_0_8 as amqp
 from RuoteAMQP.workitem import Workitem
+import logging
+
+logging.basicConfig(format='%(asctime)s %(name)s %(levelname)s: %(message)s', \
+                    level=logging.INFO)
 
 try:
     import json
@@ -62,11 +66,9 @@ def format_exception(exc):
                                     str(exc))
     return exc_str
 
-def print_block(msg):
-    """Print message in a block with separator lines at begining and end."""
-    print "-" * 78
-    print msg
-    print "-" * 78
+def format_block(msg):
+    """Format message in a block with separator lines at begining and end."""
+    return "\n%s\n%s\n%s\n" % ("-" * 78,  msg, "-" * 78)
 
 class ConsumerThread(Thread):
     """Thread for running the Participant.consume()"""
@@ -75,22 +77,23 @@ class ConsumerThread(Thread):
         self.__participant = participant
         self.exception = None
         self.trace = None
+        self.log = logging.getLogger(__name__)
 
     def run(self):
         try:
             self.__participant.consume()
         except Exception, exobj:
             # This should be configureable:
-            print "Exception in participant %s" % \
-                    (self.__participant.workitem.participant_name)
-            print "while handling instance %s of process %s " % \
-                    (self.__participant.workitem.wfid,
-                     self.__participant.workitem.wf_name)
-
-            print_block(traceback.format_exc())
-            print "Note: for information only. Participant remains functional."\
-                  "\n      Error is being signalled to the workflow (unless" \
-                  "\n      this workitem is 'forgotten')."
+            self.log.error("Exception in participant %s\n"\
+                           "while handling instance %s of process %s\n"\
+                           "Note: for information only. Participant remains"\
+                           " functional.\n"\
+                           "Error is being signalled to the workflow (unless"\
+                           " this workitem is 'forgotten').\n" % \
+                           (self.__participant.workitem.participant_name,
+                            self.__participant.workitem.wfid,
+                            self.__participant.workitem.wf_name))
+            self.log.error(format_block(traceback.format_exc()))
             self.exception = exobj
             self.trace = traceback.extract_tb(sys.exc_traceback)
 
@@ -117,6 +120,7 @@ class Participant(object):
         self._consumer_tag = None
         self._running = False
         self.workitem = None
+        self.log = logging.getLogger(__name__)
 
     def _open_channel(self, connection):
         """Open and initialize the amqp channel."""
@@ -151,9 +155,10 @@ class Participant(object):
         except ValueError, exobj:
             # Reject and don't requeue the message
             self._chan.basic_reject(tag, False)
-            print "Exception decoding incoming json"
-            print_block(msg.body)
-            print "Note: Now re-raising exception"
+            self.log.warning("Exception decoding incoming json\n" \
+                             "%s\n" \
+                             "Note: Now re-raising exception\n" % \
+                             format_block(msg.body))
             raise exobj
 
         # Launch consume() in separate thread so it doesn't get interrupted by

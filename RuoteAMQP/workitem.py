@@ -140,7 +140,10 @@ class Workitem(object):
         Returns the "workflow name" (generic workflow name) of
         the process which issued this workitem.
         """
-        return self._h['wf_name']
+        try:
+            return self._h['wf_name']
+        except:
+            return None
 
     @property
     def wfid(self):
@@ -167,12 +170,18 @@ class Workitem(object):
         the workitem is transiting inside of its process instance (as opposed
         to when it's being delivered outside of the engine).
         """
-        return self._h['participant_name']
+        try:
+            return self._h['participant_name']
+        except:
+            return None
 
     @property
     def fields(self):
         "Returns the payload, ie the fields hash."
-        return DictAttrProxy(self._h['fields'])
+        try:
+            return DictAttrProxy(self._h['fields'])
+        except:
+            return DictAttrProxy({})
 
     @fields.setter
     def fields(self, fields):
@@ -205,10 +214,12 @@ class Workitem(object):
     @property
     def forget(self):
         "Is this workitem forgotten? If so no reply is expected."
-        if self.params.forget:
-            return True
-        else:
-            return False
+        try:
+            if self.params.forget:
+                return True
+        except:
+            pass
+        return False
 
     @forget.setter
     def forget(self, value):
@@ -328,7 +339,10 @@ class Workitem(object):
         contains
            { 'ref' => 'toto', 'task' => 'x' }
         """
-        return DictAttrProxy(self._h['fields']['params'])
+        try:
+            return DictAttrProxy(self._h['fields']['params'])
+        except:
+            return DictAttrProxy({})
 
     def dump(self):
         "A useful and consistent dump format"

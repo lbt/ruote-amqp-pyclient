@@ -120,6 +120,13 @@ class Workitem(object):
         return self._h
 
     @property
+    def is_cancel(self):
+        "Is this a 'cancel' workitem?"
+        if "cancel" in self._h and self._h["cancel"]:
+            return True
+        return False
+
+    @property
     def sid(self):
         """
         The string id for this workitem (something like "0_0!!20100507-wagamama").

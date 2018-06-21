@@ -163,17 +163,20 @@ class Participant(object):
 
         # Launch consume() in separate thread so it doesn't get interrupted by
         # signals
-        consumer = ConsumerThread(self)
-        consumer.start()
-        consumer.join()
-        if consumer.exception:
-            # Note: the mechanism below is different than the one
-            # ruote-beanstalk uses. That sends the message in an array
-            # where the first element indicates the message type
-            # (workitem or error)
+        if not self.workitem.is_cancel:
+            consumer = ConsumerThread(self)
+            consumer.start()
+            consumer.join()
+            if consumer.exception:
+                # Note: the mechanism below is different than the one
+                # ruote-beanstalk uses. That sends the message in an array
+                # where the first element indicates the message type
+                # (workitem or error)
 
-            self.workitem.error = format_exception(consumer.exception)
-            self.workitem.trace = format_ruby_backtrace(consumer.trace)
+                self.workitem.error = format_exception(consumer.exception)
+                self.workitem.trace = format_ruby_backtrace(consumer.trace)
+        else:
+            self.log.warning("Ignoring a cancel message")
 
         # Acknowledge the message as received
         self._chan.basic_ack(tag)

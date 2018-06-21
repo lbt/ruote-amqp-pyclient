@@ -2,3 +2,4 @@ setup.py
 RuoteAMQP/__init__.py
 RuoteAMQP/participant.py
 RuoteAMQP/workitem.py
+RuoteAMQP/launcher.py

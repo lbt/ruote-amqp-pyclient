@@ -1,30 +1,31 @@
 #!/usr/bin/python2.6
-#~ Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
-#~ Contact: David Greaves <ext-david.greaves@nokia.com>
-#~ This program is free software: you can redistribute it and/or modify
-#~ it under the terms of the GNU General Public License as published by
-#~ the Free Software Foundation, either version 3 of the License, or
-#~ (at your option) any later version.
+# Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
+# Contact: David Greaves <ext-david.greaves@nokia.com>
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
 
-#~ This program is distributed in the hope that it will be useful,
-#~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-#~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#~ GNU General Public License for more details.
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
 
-#~ You should have received a copy of the GNU General Public License
-#~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """ Abstract participant class """
 
 from __future__ import with_statement
-import sys, traceback
+import sys
+import traceback
 from threading import Thread
 from urllib2 import HTTPError
 from amqplib import client_0_8 as amqp
 from RuoteAMQP.workitem import Workitem
 import logging
 
-logging.basicConfig(format='%(asctime)s %(name)s %(levelname)s: %(message)s', \
+logging.basicConfig(format='%(asctime)s %(name)s %(levelname)s: %(message)s',
                     level=logging.INFO)
 
 try:
@@ -32,11 +33,13 @@ try:
 except ImportError:
     import simplejson as json
 
+
 def format_ruby_backtrace(trace):
-    """Formats a python traceback so that a ruby Exception accepts it 
+    """Formats a python traceback so that a ruby Exception accepts it
        as a backtrace."""
-    return ["%s:%d: in `%s %s'" % (item[0], item[1], item[2], item[3]) \
+    return ["%s:%d: in `%s %s'" % (item[0], item[1], item[2], item[3])
             for item in trace]
+
 
 def format_exception(exc):
     """Formats exception to more informative string based on exception type."""
@@ -48,27 +51,28 @@ def format_exception(exc):
     # http://docs.python.org/library/exceptions.html#exceptions.EnvironmentError
     elif isinstance(exc, EnvironmentError):
         if exc.filename:
-            exc_str = "{0}({1}): {2} {3}".format(exc.__class__.__name__, \
-                                                 exc.errno, exc.filename, \
+            exc_str = "{0}({1}): {2} {3}".format(exc.__class__.__name__,
+                                                 exc.errno, exc.filename,
                                                  exc.strerror)
         elif exc.errno and exc.strerror:
-            exc_str = "{0}({1}): {2}".format(exc.__class__.__name__, \
-                                                 exc.errno, exc.strerror)
+            exc_str = "{0}({1}): {2}".format(exc.__class__.__name__,
+                                             exc.errno, exc.strerror)
         else:
             exc_str = "{0}: {1}".format(exc.__class__.__name__, str(exc))
     # osc exceptions don't set args and message correctly so str(exc) contains
-    # only the exception class name. However it has a msg attribute which has 
+    # only the exception class name. However it has a msg attribute which has
     # sensible contents so use that
     elif hasattr(exc, "msg"):
         exc_str = "{0}: {1}".format(exc.__class__.__name__, exc.msg)
     else:
-        exc_str = "{0}: {1}".format(exc.__class__.__name__, \
-                                    str(exc))
+        exc_str = "{0}: {1}".format(exc.__class__.__name__, str(exc))
     return exc_str
+
 
 def format_block(msg):
     """Format message in a block with separator lines at begining and end."""
     return "\n%s\n%s\n%s\n" % ("-" * 78,  msg, "-" * 78)
+
 
 class ConsumerThread(Thread):
     """Thread for running the Participant.consume()"""
@@ -82,20 +86,21 @@ class ConsumerThread(Thread):
     def run(self):
         try:
             self.__participant.consume()
-        except Exception, exobj:
+        except Exception as exobj:
             # This should be configureable:
-            self.log.error("Exception in participant %s\n"\
-                           "while handling instance %s of process %s\n"\
-                           "Note: for information only. Participant remains"\
-                           " functional.\n"\
-                           "Error is being signalled to the workflow (unless"\
-                           " this workitem is 'forgotten').\n" % \
+            self.log.error("Exception in participant %s\n"
+                           "while handling instance %s of process %s\n"
+                           "Note: for information only. Participant remains"
+                           " functional.\n"
+                           "Error is being signalled to the workflow (unless"
+                           " this workitem is 'forgotten').\n" %
                            (self.__participant.workitem.participant_name,
                             self.__participant.workitem.wfid,
                             self.__participant.workitem.wf_name))
             self.log.error(format_block(traceback.format_exc()))
             self.exception = exobj
             self.trace = traceback.extract_tb(sys.exc_traceback)
+
 
 class Participant(object):
     """
@@ -109,8 +114,8 @@ class Participant(object):
     """
 
     def __init__(self, ruote_queue,
-               amqp_host = "localhost", amqp_user = "ruote",
-               amqp_pass = "ruote", amqp_vhost = "ruote"):
+                 amqp_host="localhost", amqp_user="ruote",
+                 amqp_pass="ruote", amqp_vhost="ruote"):
 
         self._conn_params = dict(
                 host=amqp_host, userid=amqp_user, password=amqp_pass,
@@ -126,18 +131,19 @@ class Participant(object):
         """Open and initialize the amqp channel."""
         if self._chan is None or not self._chan.is_open:
             self._chan = connection.channel()
-            # set qos option on this channel with prefetch count 1 whole message
-            # of any size
+            # set qos option on this channel with prefetch count 1 whole
+            # message of any size
             self._chan.basic_qos(0, 1, False)
             # Declare a shareable queue for the participant
             self._chan.queue_declare(
                     queue=self._queue, durable=True, exclusive=False,
                     auto_delete=False)
             # Currently ruote-amqp uses the anonymous direct exchange
-            #self._chan.exchange_declare(
-            #       exchange="", type="direct", durable=True, auto_delete=False)
+            # self._chan.exchange_declare(
+            #       exchange="", type="direct",
+            #       durable=True, auto_delete=False)
             # Bind our queue using a routing key of our queue name
-            #self._chan.queue_bind(
+            # self._chan.queue_bind(
             #        queue=self._queue, exchange="", routing_key=self._queue)
             # and set a callback for workitems
             self._consumer_tag = self._chan.basic_consume(
@@ -152,12 +158,12 @@ class Participant(object):
         tag = msg.delivery_info["delivery_tag"]
         try:
             self.workitem = Workitem(msg.body)
-        except ValueError, exobj:
+        except ValueError as exobj:
             # Reject and don't requeue the message
             self._chan.basic_reject(tag, False)
-            self.log.warning("Exception decoding incoming json\n" \
-                             "%s\n" \
-                             "Note: Now re-raising exception\n" % \
+            self.log.warning("Exception decoding incoming json\n"
+                             "%s\n"
+                             "Note: Now re-raising exception\n" %
                              format_block(msg.body))
             raise exobj
 
@@ -216,7 +222,6 @@ class Participant(object):
             self._chan.basic_cancel(self._consumer_tag)
         self._running = False
 
-
     def reply_to_engine(self, workitem=None):
         """
         When the job is complete the workitem is passed back to the
@@ -235,4 +240,4 @@ class Participant(object):
         # Notice that this is sent to the anonymous/'' exchange (which is
         # different to 'amq.direct') with a routing_key for the queue
         self._chan.basic_publish(msg, exchange='',
-                routing_key='ruote_workitems')
+                                 routing_key='ruote_workitems')

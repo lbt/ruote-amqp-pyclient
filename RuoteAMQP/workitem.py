@@ -6,6 +6,7 @@ except ImportError:
     import simplejson as json
 from copy import deepcopy
 
+
 class DictAttrProxy(object):
     """
     This allows a dict object to be accessed in a pretty way.
@@ -18,8 +19,8 @@ class DictAttrProxy(object):
       wi => {'ev': {'items': [1, 5, 3], 'val': 5}}
     """
     def __init__(self, d):
-        # This: 
-        #   self._d = d 
+        # This:
+        #   self._d = d
         # won't work as we can't set a local attribute as we override
         # __setattr__ so instead we poke straight into the __dict__ :
         self.__dict__['_d'] = d
@@ -31,6 +32,7 @@ class DictAttrProxy(object):
         if type(r) is dict:
             return DictAttrProxy(r)
         return r
+
     # Note that writing into an entry creates it.
     def __setattr__(self, attr, value):
         self._d[attr] = value
@@ -43,14 +45,14 @@ class FlowExpressionId(object):
     """
     The FlowExpressionId (fei for short) is an process expression identifier.
     Each expression when instantiated gets a unique fei.
-    
+
     Feis are also used in workitems, where the fei is the fei of the
     [participant] expression that emitted the workitem.
-    
+
     Feis can thus indicate the position of a workitem in a process tree.
-    
+
     Feis contain four pieces of information :
-  
+
     * wfid : workflow instance id, the identifier for the process instance
     * subid : the identifier for the sub process within the main instance
     * expid : the expression id, where in the process tree
@@ -79,7 +81,7 @@ class FlowExpressionId(object):
 
     def to_storage_id(self):
         return "%s!%s!%s" % (
-            self._h['expid'], 
+            self._h['expid'],
             self._h['subid'] if self._h['subid'] else self._h['sub_wfid'],
             self._h['wfid'])
 
@@ -90,18 +92,22 @@ class FlowExpressionId(object):
         '0_5_7', the child_id will be '7'.
         """
         try:
-            return int(self._h.expid.split(CHILD_SEP)[-1])
+            return int(self._h.expid.split(self.CHILD_SEP)[-1])
         except ValueError:
-            return None       
+            return None
 
     def direct_child(self, other_fei):
-        
-        for k in  [ "sub_wfid", "wfid", "engine_id" ] :
-            if self._h[k] != other_fei[k] : return False 
 
-        pei = join(CHILD_SEP, reverse(split(CHILD_SEP, other_fei['expid'])))
-        if pei == self._h['expid']: return True
+        for k in ["sub_wfid", "wfid", "engine_id"]:
+            if self._h[k] != other_fei[k]:
+                return False
+
+        pei = self.CHILD_SEP.join(list(reversed(
+            other_fei['expid'].split(self.CHILD_SEP))))
+        if pei == self._h['expid']:
+            return True
         return False
+
 
 class Workitem(object):
     """
@@ -129,8 +135,8 @@ class Workitem(object):
     @property
     def sid(self):
         """
-        The string id for this workitem (something like "0_0!!20100507-wagamama").
-        Not implemented.
+        The string id for this workitem
+        (something like "0_0!!20100507-wagamama").
         """
         return self._fei.to_storage_id()
 
@@ -157,7 +163,6 @@ class Workitem(object):
     def fei(self):
         "Returns a Ruote::FlowExpressionId instance."
         return FlowExpressionId(self._h['fei'])
-
 
     def dup(self):
         """Returns a complete copy of this workitem."""
@@ -226,14 +231,16 @@ class Workitem(object):
         assert isinstance(value, bool)
         self.params.forget = value
 
-    def __eq__ (self, other):
+    def __eq__(self, other):
         "Warning : equality is based on fei and not on payload !"
-        if isinstance(other, type(self)): return false
+        if isinstance(other, type(self)):
+            return False
         return self._h['fei'] == other.h['fei']
 
-    def __ne__ (self, other):
-        if (self == other): return True
-        return False 
+    def __ne__(self, other):
+        if (self == other):
+            return True
+        return False
 
     def hash(self):
         "Warning : hash is fei's hash."
@@ -253,9 +260,9 @@ class Workitem(object):
         is equivalent to
            workitem.fields['toto']['address']
         """
-        ref=self._h['fields']
+        ref = self._h['fields']
         for k in key.split("."):
-            if not k in ref:
+            if k not in ref:
                 return None
             ref = ref[k]
         return ref
@@ -263,23 +270,24 @@ class Workitem(object):
     lf = lookup
 
     def set_field(self, key, value):
-        """
-        Like #lookup allows for nested lookups, #set_field can be used
+        """Like #lookup allows for nested lookups, #set_field can be used
         to set sub fields directly.
 
         workitem.set_field('customer.address.city', 'Pleasantville')
 
-        Warning : if the customer and address field and subfield are not present
-        or are not hashes, set_field will simply create a "customer.address.city"
-        field and set its value to "Pleasantville".
+        Warning : if the customer and address field and subfield are
+        not present or are not hashes, set_field will simply create a
+        "customer.address.city" field and set its value to
+        "Pleasantville".
+
         """
 
-        ref=self._h['fields']
+        ref = self._h['fields']
         ks = key.split(".")
         last = ks.pop()
         for k in ks:
-            if not k in ref:
-                ref[k]={}
+            if k not in ref:
+                ref[k] = {}
             ref = ref[k]
         ref[last] = value
 
@@ -295,7 +303,7 @@ class Workitem(object):
     def error(self):
         """
         Reads any previously set value.
-        
+
         Accesses the ruote-AMQP specific wi.['__error__']
         """
         return self._h['error']
@@ -304,7 +312,7 @@ class Workitem(object):
     def error(self, err):
         """
         Cause a process level error if the Workitem is returned.
-        
+
         Shortcut for the ruote-AMQP specific wi.['__error__']
         """
         self._h['error'] = err
@@ -323,7 +331,7 @@ class Workitem(object):
     def trace(self, trace):
         """
         Sets a backtrace.
- 
+
         Shortcut for the ruote-AMQP specific wi.['trace']
         """
         self._h['trace'] = trace

@@ -11,12 +11,14 @@ class DictAttrProxy(object):
     """
     This allows a dict object to be accessed in a pretty way.
     Given :
-      wi = { 'ev': { 'val': 5, 'items': [1,2,3] } }
+      wi = { 'ev': { 'val': 5, 'items': [1,2,3], 'nest': { 'in': 'In', 'out': 'Out' } } }
     then
       wip = DictAttrProxy(wi)
       wip.ev.val => 5
       wip.ev.items[1]=5
       wi => {'ev': {'items': [1, 5, 3], 'val': 5}}
+
+    It is iterable and nested dicts will be proxied too
     """
     def __init__(self, d):
         # This:
@@ -36,6 +38,17 @@ class DictAttrProxy(object):
     # Note that writing into an entry creates it.
     def __setattr__(self, attr, value):
         self._d[attr] = value
+
+    # Passthru to the dict __iter__() and /__next__()
+    def __iter__(self):
+        return self._d.__iter__()
+
+    def __next__(self):
+        r = self._d.next()
+        if type(r) is dict:
+            return DictAttrProxy(r)
+        return r
+
     # and if we want to use this syntax to get at a nested dict:
     def as_dict(self):
         return self._d
